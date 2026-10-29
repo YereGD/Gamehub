@@ -1,0 +1,13 @@
+package com.Yere.Gamehub.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import com.Yere.Gamehub.model.Game;
+
+public interface Gamerepository {
+
+    List<Game> findAll();
+
+    Optional<Game> findById(int id);
+}
