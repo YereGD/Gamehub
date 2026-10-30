@@ -1,6 +1,7 @@
 package com.Yere.Gamehub.service;
 
 import com.Yere.Gamehub.model.Game;
+import com.Yere.Gamehub.repository.GameRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,28 +16,26 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class GameService {
 
-    private final List<Game> games = new ArrayList<>(List.of(
-		new Game("Valorant", 1),
-		new Game("Minecraft", 2),
-		new Game("League of Legends", 3)
-    ));
+    private final GameRepository gameRepository;
+
+    public GameService(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
+    }
 
     public List<Game> getGames() {
-        return games;
+        return gameRepository.findAll();
     }
 
     public Game getGameById(int id) {
-        return games.stream()
-            .filter(game -> game.id() == id)
-            .findFirst()
+        return gameRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
     }
     
     public Game createGame(Game game) {
-        if (games.stream().anyMatch(existingGame -> existingGame.id() == game.id())) {
+        if (!gameRepository.findById(game.id()).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game with this ID already exists");
         }
-        games.add(game);
+        gameRepository.save(game);
         return game;
     }
 
@@ -44,18 +43,16 @@ public class GameService {
         if (updatedGame.id() != id) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID in path and request body must match");
         }
-        for (int i = 0; i < games.size(); i++) {
-            if (games.get(i).id() == id) {
-                games.set(i, updatedGame);
-                return updatedGame;
-            }
+        if (gameRepository.findById(id).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
+        return gameRepository.save(updatedGame);
     }
 
     public void deleteGame(int id) {
-        if (!games.removeIf(game -> game.id() == id)) {
+        if (gameRepository.findById(id).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
         }
+        gameRepository.deleteById(id);
     }
 }
