@@ -3,7 +3,6 @@ package com.Yere.Gamehub.service;
 import com.Yere.Gamehub.model.Game;
 import com.Yere.Gamehub.repository.GameRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,9 @@ public class GameService {
     }
 
     public Game getGameById(int id) {
+        if (id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID must be a positive integer");
+        }
         return gameRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
     }

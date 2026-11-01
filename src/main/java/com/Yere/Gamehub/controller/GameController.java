@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.Yere.Gamehub.service.GameService;
+
+import jakarta.validation.Valid;
+
 import com.Yere.Gamehub.model.Game;
 
 
@@ -38,13 +41,13 @@ public class GameController {
 	}
 
 	@PostMapping (path = "/api/games", consumes = "application/json")
-	public ResponseEntity<Game> createGame(@RequestBody Game game) {
+	public ResponseEntity<Game> createGame(@Valid @RequestBody Game game) {
 		Game gameCreated = gameService.createGame(game);
 		return new ResponseEntity<>(gameCreated, HttpStatus.CREATED);
 	}
 	
 	@PutMapping (path = "/api/games/{id}", consumes = "application/json")
-	public ResponseEntity<Game> updateGame(@PathVariable int id, @RequestBody Game updatedGame) {
+	public ResponseEntity<Game> updateGame(@PathVariable int id, @Valid @RequestBody Game updatedGame) {
 		Game gameUpdated = gameService.updateGame(id, updatedGame);
 		return new ResponseEntity<>(gameUpdated, HttpStatus.OK);
 	}
