@@ -36,7 +36,7 @@ public class GameController {
 	}
 
 	@GetMapping ("/api/games/{id}")
-	public Game getGameById(@PathVariable int id) {
+	public Game getGameById(@PathVariable Long id) {
 		return gameService.getGameById(id);
 	}
 
@@ -47,13 +47,13 @@ public class GameController {
 	}
 	
 	@PutMapping (path = "/api/games/{id}", consumes = "application/json")
-	public ResponseEntity<Game> updateGame(@PathVariable int id, @Valid @RequestBody Game updatedGame) {
+	public ResponseEntity<Game> updateGame(@PathVariable Long id, @Valid @RequestBody Game updatedGame) {
 		Game gameUpdated = gameService.updateGame(id, updatedGame);
 		return new ResponseEntity<>(gameUpdated, HttpStatus.OK);
 	}
 
 	@DeleteMapping ("/api/games/{id}")
-	public ResponseEntity<Void> deleteGame(@PathVariable int id) {
+	public ResponseEntity<Void> deleteGame(@PathVariable Long id) {
 		gameService.deleteGame(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

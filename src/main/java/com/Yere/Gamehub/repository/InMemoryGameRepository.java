@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Repository;
 
 import com.Yere.Gamehub.model.Game;
 
-@Repository 
 
 public class InMemoryGameRepository implements GameRepository {
 
     private final List<Game> games = new ArrayList<>(List.of(
-        new Game("Valorant", 1),
-        new Game("Minecraft", 2),
-        new Game("League of Legends", 3)
+        new Game("Valorant", 1L),
+        new Game("Minecraft", 2L),
+        new Game("League of Legends", 3L)
     ));
 
     @Override
@@ -24,7 +22,7 @@ public class InMemoryGameRepository implements GameRepository {
     }
 
     @Override
-    public Optional<Game> findById(int id) {
+    public Optional<Game> findById(Long id) {
         return games.stream()
             .filter(game -> game.id() == id)
             .findFirst();
@@ -38,7 +36,7 @@ public class InMemoryGameRepository implements GameRepository {
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteById(Long id) {
         games.removeIf(game -> game.id() == id);
     }
 }

@@ -9,9 +9,9 @@ public interface GameRepository {
 
     List<Game> findAll();
 
-    Optional<Game> findById(int id);
+    Optional<Game> findById(Long id);
 
     Game save(Game game);
 
-    void deleteById(int id);
+    void deleteById(Long id);
 }

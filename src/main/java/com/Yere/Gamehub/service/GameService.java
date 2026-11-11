@@ -25,7 +25,7 @@ public class GameService {
         return gameRepository.findAll();
     }
 
-    public Game getGameById(int id) {
+    public Game getGameById(long id) {
         if (id <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID must be a positive integer");
         }
@@ -34,24 +34,21 @@ public class GameService {
     }
     
     public Game createGame(Game game) {
-        if (!gameRepository.findById(game.id()).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game with this ID already exists");
+        if(game.id() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New game should not have an ID");
         }
-        gameRepository.save(game);
-        return game;
+        return gameRepository.save(game);
     }
 
-    public Game updateGame(int id, Game updatedGame) {
-        if (updatedGame.id() != id) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID in path and request body must match");
-        }
+    public Game updateGame(Long id, Game updatedGame) {
         if (gameRepository.findById(id).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
         }
-        return gameRepository.save(updatedGame);
+        Game updatedGameWithId = new Game(updatedGame.name(), id);
+        return gameRepository.save(updatedGameWithId);
     }
 
-    public void deleteGame(int id) {
+    public void deleteGame(long id) {
         if (gameRepository.findById(id).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
         }
