@@ -44,8 +44,7 @@ public class GameService {
         if (gameRepository.findById(id).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found");
         }
-        Game updatedGameWithId = new Game(updatedGame.name(), id);
-        return gameRepository.save(updatedGameWithId);
+        return gameRepository.save(updatedGame);
     }
 
     public void deleteGame(long id) {
