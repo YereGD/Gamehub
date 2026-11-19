@@ -3,7 +3,6 @@ package com.Yere.Gamehub.controller;
 import java.net.URI;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Yere.Gamehub.dto.CreateGameRequest;
 import com.Yere.Gamehub.dto.GameResponse;
 import com.Yere.Gamehub.dto.UpdatedGameRequest;
+import com.Yere.Gamehub.mapper.GameMapper;
 import com.Yere.Gamehub.model.Game;
 import com.Yere.Gamehub.service.GameService;
 
@@ -34,7 +34,7 @@ public class GameController {
 	@GetMapping("/api/games")
 	public ResponseEntity<List<GameResponse>> getGames() {
         List<GameResponse> gamesResponse = gameService.getGames().stream()
-            .map(game -> new GameResponse(game.id(), game.name()))
+            .map(GameMapper::toResponse)
             .toList();
 		return ResponseEntity.ok(gamesResponse);
 	}
@@ -42,37 +42,31 @@ public class GameController {
 	@GetMapping ("/api/games/{id}")
 	public ResponseEntity<GameResponse> getGameById(@PathVariable Long id) {
 		Game game = gameService.getGameById(id);
-		GameResponse response = new GameResponse(
-			game.id(),
-			game.name()
-		);
+		GameResponse response = GameMapper.toResponse(game);
 		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping (path = "/api/games", consumes = "application/json")
 	public ResponseEntity<GameResponse> createGame(@Valid @RequestBody CreateGameRequest request) {
-		Game game = new Game(request.name(), null);	
+		Game game = GameMapper.toGame(request);
 		Game gameCreated = gameService.createGame(game);
-		GameResponse response = new GameResponse(
-			gameCreated.id(), 
-			gameCreated.name()
-		);
+		GameResponse response = GameMapper.toResponse(gameCreated);	
 		URI location = URI.create(String.format("/api/games/%s", gameCreated.id()));
 		return ResponseEntity.created(location).body(response);
 	}
 	
 	@PutMapping (path = "/api/games/{id}", consumes = "application/json")
 	public ResponseEntity<GameResponse> updateGame(@PathVariable Long id, @Valid @RequestBody UpdatedGameRequest request) {
-		Game game = new Game(request.name(), id);
-		Game gameUpdated = gameService.updateGame(id, game);
-		GameResponse response = new GameResponse(gameUpdated.id(), gameUpdated.name());
+		Game game = GameMapper.toGame(request, id);
+		Game gameUpdated = gameService.updateGame(game);
+		GameResponse response = GameMapper.toResponse(gameUpdated);
 		return ResponseEntity.ok(response);
 	}
 
 	@DeleteMapping ("/api/games/{id}")
 	public ResponseEntity<Void> deleteGame(@PathVariable Long id) {
 		gameService.deleteGame(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return ResponseEntity.noContent().build();	
 	}
 }
 

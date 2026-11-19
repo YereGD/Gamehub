@@ -36,7 +36,14 @@ public class InMemoryGameRepository implements GameRepository {
     }
 
     @Override
-    public void deleteById(Long id) {
-        games.removeIf(game -> game.id() == id);
+    public boolean deleteById(Long id) {
+        return games.removeIf(game -> game.id() == id);
+    }
+    
+    // The update method is not implemented in this in-memory repository cause it was added after the initial implementation. It should be implemented to update an existing game in the list.
+    @Override
+    public Optional<Game> update(Game game) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 }

@@ -1,10 +1,11 @@
 package com.Yere.Gamehub.repository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
+
+import com.Yere.Gamehub.mapper.GameEntityMapper;
 import com.Yere.Gamehub.model.Game;
 import com.Yere.Gamehub.model.GameEntity;
 import com.Yere.Gamehub.repository.jpa.JpaGameRepository;
@@ -23,36 +24,39 @@ public class PostgresGameRepository implements GameRepository {
     public List<Game> findAll() {
         return jpaGameRepository.findAll()
         .stream()
-        .map(gameEntity -> new Game(
-            gameEntity.getName(),
-            gameEntity.getId()))
+        .map(GameEntityMapper::toGame)
             .toList();
     }
     
     @Override 
     public Optional<Game> findById(Long id) {
-        return jpaGameRepository.findById(id).map(gameEntity -> new Game(
-            gameEntity.getName(),
-            gameEntity.getId()));
+        return jpaGameRepository.findById(id).map(GameEntityMapper::toGame);
     }
 
     @Override 
     public Game save(Game game) {
-        if (game.id() == null) {
-            GameEntity gameEntity = new GameEntity(game.name());
-            GameEntity savedGameEntity = jpaGameRepository.save(gameEntity);
-            return new Game(savedGameEntity.getName(), savedGameEntity.getId());
-        }
-        GameEntity existingEntity = jpaGameRepository.findById(game.id())
-        .orElseThrow(() -> new NoSuchElementException("Game with ID " + game.id() + " not found"));
-        existingEntity.setName(game.name());
-        GameEntity updatedEntity = jpaGameRepository.save(existingEntity);
-        return new Game(updatedEntity.getName(), updatedEntity.getId());
+        GameEntity gameEntity = GameEntityMapper.toEntity(game);
+        GameEntity savedGameEntity = jpaGameRepository.save(gameEntity);
+        return GameEntityMapper.toGame(savedGameEntity);
+    }
+
+    @Override
+    public Optional<Game> update(Game game) {
+        return jpaGameRepository.findById(game.id())
+        .map(existingEntity -> {
+            GameEntityMapper.updateEntity(existingEntity, game);
+            return GameEntityMapper.toGame(existingEntity);
+        });       
     }
 
     @Override 
-    public void deleteById(Long id) {
-        jpaGameRepository.deleteById(id);
+    public boolean deleteById(Long id) {
+        Optional<GameEntity> gameEntity = jpaGameRepository.findById(id);
+        if(gameEntity.isEmpty()) {
+            return false;
+        }
+        jpaGameRepository.delete(gameEntity.get());
+        return true;
     }
 
 }

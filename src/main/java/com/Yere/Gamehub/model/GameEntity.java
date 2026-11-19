@@ -12,6 +12,8 @@ public class GameEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+    
     public GameEntity(String name) {
         this.name = name;
     }
@@ -22,10 +24,6 @@ public class GameEntity {
     public Long getId() {
         return id;
     }
-
-    private String name;
-
-    
 
     public String getName() {
         return name;
