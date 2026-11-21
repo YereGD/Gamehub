@@ -3,6 +3,8 @@ package com.Yere.Gamehub.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,8 +18,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler (ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
-        Map<String, String> errorMessage = new HashMap<>();
-        errorMessage.put("message", ex.getReason());
         return ResponseEntity.status(ex.getStatusCode())
         .body(Map.of("message", ex.getReason()));
     }
@@ -33,18 +33,43 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler (GameNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleGameNotFoundException(GameNotFoundException ex) {
-        Map<String, String> errorMessage = new HashMap<>();
-        errorMessage.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler (InvalidGameException.class)
     public ResponseEntity<Map<String, String>> handleInvalidGameException(InvalidGameException ex) {
-        Map<String, String> errorMessage = new HashMap<>();
-        errorMessage.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(Map.of("message", ex.getMessage()));
     }
 
+    @ExceptionHandler (GameAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleGameAlreadyExistsException(GameAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex) {
+
+        Throwable cause = ex;
+
+        while (cause != null) {
+            if (cause instanceof ConstraintViolationException constraintEx
+                    && "23505".equals(constraintEx.getSQLState())
+                    && "ux_game_entity_name_ci".equals(
+                        constraintEx.getConstraintName())) {
+
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of(
+                            "message",
+                            "A game with that name already exists"
+                        ));
+            }
+
+            cause = cause.getCause();
+        }
+        throw ex;
+    }
 }

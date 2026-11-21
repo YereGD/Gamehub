@@ -42,6 +42,7 @@ public class PostgresGameRepository implements GameRepository {
 
     @Override
     public Optional<Game> update(Game game) {
+        
         return jpaGameRepository.findById(game.id())
         .map(existingEntity -> {
             GameEntityMapper.updateEntity(existingEntity, game);
@@ -59,4 +60,13 @@ public class PostgresGameRepository implements GameRepository {
         return true;
     }
 
+    @Override
+    public boolean existsByNameIgnoreCase(String name) {
+        return jpaGameRepository.existsByNameIgnoreCase(name);
+    }
+
+    @Override
+    public boolean existsByNameIgnoreCaseAndIdNot(String name, Long id) {
+        return jpaGameRepository.existsByNameIgnoreCaseAndIdNot(name, id);
+    }
 }

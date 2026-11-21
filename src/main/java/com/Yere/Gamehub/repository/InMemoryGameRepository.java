@@ -43,7 +43,18 @@ public class InMemoryGameRepository implements GameRepository {
     // The update method is not implemented in this in-memory repository cause it was added after the initial implementation. It should be implemented to update an existing game in the list.
     @Override
     public Optional<Game> update(Game game) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    // The existsByNameIgnoreCase method is not implemented in this in-memory repository cause it was added after the initial implementation. It should be implemented to check if a game with the given name exists in the list, ignoring case.
+    @Override
+    public boolean existsByNameIgnoreCase(String name) {
+        throw new UnsupportedOperationException("Unimplemented method 'existsByNameIgnoreCase'");
+    }
+
+    // The existsByNameIgnoreCaseAndIdNot method is not implemented in this in-memory repository cause it was added after the initial implementation. It should be implemented to check if a game with the given name exists in the list, ignoring case, and has a different ID than the one provided.
+    @Override
+    public boolean existsByNameIgnoreCaseAndIdNot(String name, Long id) {
+        throw new UnsupportedOperationException("Unimplemented method 'existsByNameIgnoreCaseAndIdNot'");
     }
 }

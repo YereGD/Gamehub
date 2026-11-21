@@ -1,5 +1,6 @@
 package com.Yere.Gamehub.service;
 
+import com.Yere.Gamehub.exception.GameAlreadyExistsException;
 import com.Yere.Gamehub.exception.GameNotFoundException;
 import com.Yere.Gamehub.exception.InvalidGameException;
 import com.Yere.Gamehub.model.Game;
@@ -38,12 +39,18 @@ public class GameService {
         if(game.id() != null) {
             throw new InvalidGameException("New game should not have an ID");
         }
+        if(gameRepository.existsByNameIgnoreCase(game.name())) {
+            throw new GameAlreadyExistsException("Game with name '" + game.name() + "' already exists");
+        }
         return gameRepository.save(game);
     }
     
     @Transactional 
     public Game updateGame(Game updatedGame) {
         validateId(updatedGame.id());
+        if(gameRepository.existsByNameIgnoreCaseAndIdNot(updatedGame.name(), updatedGame.id())) {
+            throw new GameAlreadyExistsException("Game with name '" + updatedGame.name() + "' already exists");
+        }
         return gameRepository.update(updatedGame)
             .orElseThrow(() -> new GameNotFoundException("Game with ID " + updatedGame.id() + " not found"));
     }

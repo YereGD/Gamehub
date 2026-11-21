@@ -16,4 +16,8 @@ public interface GameRepository {
     Game save(Game game);
 
     boolean deleteById(Long id);
+
+    boolean  existsByNameIgnoreCase(String name);
+    
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
 }
